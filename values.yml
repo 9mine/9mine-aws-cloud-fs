@@ -63,13 +63,22 @@ fs: |
                                textures = {texture_prefix .. "-ec2.png"}
                            })
                        end
-
+                       
                        if entry.platform_string == prefix .. "/ec2/describe-instances" then
                            texture.download("https://www.pinclipart.com/picdir/middle/323-3231192_aws-simple-icons-compute-amazon-ec2-clipart.png", true,
                            texture_prefix .. "-ec2-instance.png", aws_textures_directory)
                            entity:set_properties({
+                               visual = "cube",
+                               textures = {texture_prefix .. "-ec2-instance.png", texture_prefix .. "-ec2-instance.png", texture_prefix .. "-ec2-instance.png", texture_prefix .. "-ec2-instance.png", texture_prefix .. "-ec2-instance.png", texture_prefix .. "-ec2-instance.png"}
+                           })
+                       end
+
+                       if entry.platform_string:match(string.gsub(prefix .. "/ec2/describe-instances", "%-", "%%%-") .. "/[%d%a%p]+") then
+                           texture.download("https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/AWS_Simple_Icons_AWS_Cloud.svg/1200px-AWS_Simple_Icons_AWS_Cloud.svg.png", true,
+                           texture_prefix .. "-ec2-conf.png", aws_textures_directory)
+                           entity:set_properties({
                                visual = "sprite",
-                               textures = {texture_prefix .. "-ec2-instance.png"}
+                               textures = {texture_prefix .. "-ec2-conf.png"}
                            })
                        end
                    end

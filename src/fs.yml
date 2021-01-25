@@ -1,0 +1,45 @@
+{% raw %}{% include './common.j2' %}{% endraw %}
+fs:
+  # root
+  "/":
+    readdir: 
+      sh: ls /accounts
+    getattr:
+      sh: *dir 
+      # /<id>
+    "/[0-9]+":
+      name: id
+      readdir: 
+        list: 
+        - ec2
+      getattr: 
+          sh: *dir
+      # /<id>/.init.lua
+      "/.init.lua":
+        getattr:
+          sh: *file
+        read_file: 
+          sh: |
+            cat <<EOF
+{% filter indent(15, first=True) -%}
+                  {% include '.init.lua'%}
+                  {%- endfilter %}       
+            EOF
+            
+      # /<id>/ec2
+      "/ec2":
+        readdir:
+          list: 
+          - describe-instances
+        getattr:
+          sh: *dir
+          # /<id>/ec2/describe-instances
+        "/describe-instances":
+          readdir:
+            sh: aws ec2 describe-instances --profile $id  | jq '.Reservations[].Instances[].InstanceId'
+          getattr:
+            sh: *dir 
+          # /<id>/ec2/describe-instances/<instance>
+          "/[a-z0-9_-]+":
+            getattr: 
+              sh: *dir 

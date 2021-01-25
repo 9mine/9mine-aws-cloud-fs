@@ -1,0 +1,64 @@
+image: 
+  repository: 9mine/9mine-aws-cloud-fs
+  tag: "main"
+  pullPolicy: Always
+
+initContainerImage:
+  repository: 9mine/execfuse-jinja2
+  tag: "master"
+  pullPolicy: Always
+
+securityContext: 
+  privileged: true
+  capabilities:
+    add:
+      - SYS_ADMIN
+
+service:
+  type: ClusterIP
+  port: 3370
+  
+ClusterIPRange:
+    from: 3371
+    to: 3390
+
+description: "awscloudfs"
+
+fs: |
+    {% filter indent() -%}{% include 'fs.yml'%}
+    {%- endfilter %}
+
+
+profile: |
+    echo --- start of profile loading ---
+    load file2chan
+    load std
+    ndb/cs
+    for host_var in `{ os env } { '{'$host_var'}' }
+    
+    dir = $EXPORT_PATH
+    port = $NINEP_PUBLIC_PORT
+    echo $NINEP_PUBLIC_HOST > /dev/sysname 
+    test -d /mnt/registry || mkdir -p /mnt/registry
+    mount -A tcp!registry!registry /mnt/registry
+    AWS_DIR = /tmp/aws/cmd
+    test -d $AWS_DIR || mkdir -p $AWS_DIR
+    load mpexpr
+    fs_port = ${expr $NINEP_PUBLIC_PORT 1 +}
+    file2chan $AWS_DIR^/aws {} {
+        load mpexpr
+        var=${expr 10 rand}
+        echo new id is $var
+        echo hostname is `{os hostname}
+        (access_key secret_key region) = `{echo ${rget data}} 
+        `{os /bin/bash -c 'mkdir -p /accounts/'^$var}
+        `{os /bin/bash -c 'aws configure set aws_access_key_id '^$access_key^' --profile'^$var}
+        `{os /bin/bash -c 'aws configure set aws_secret_access_key '^$secret_key^' --profile'^$var}
+        `{os /bin/bash -c 'aws configure set region '^$region^' --profile'^$var}
+        grid/reglisten -A -r description 'user id is '^$var tcp!*!^$fs_port { export $dir^/^$var & } &
+        fs_port=${expr $fs_port 1 +}
+    }
+        
+    grid/reglisten -A -r description ${quote $NINEP_DESCRIPTION} 'tcp!*!'^$port { export $GCLOUD_DIR & }
+    test -n $status && os pkill -9 emu-g
+    echo --- end of profile loading ---

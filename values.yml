@@ -53,17 +53,27 @@ fs: |
                        if not prefix then
                            return
                        end
-                       if entry.platform_string == prefix .. "/ec2/describe-instances" then
-                           texture.download("https://www.quotecolo.com/wp-content/uploads/2019/02/AWS-EC2-00.png", true,
-                               "9mine-aws-cloud-fs.png", "9mine-aws-cloud-fs")
+                       local aws_textures_directory = "9mine-aws-cloud-fs"
+                       local texture_prefix = "9mine-aws-cloud-fs"
+                       if entry.entry_string == prefix .. "/ec2" then
+                           texture.download("https://miro.medium.com/max/360/1*dfEIFZvuNC7ljFy2QNurLA.png", true,
+                           texture_prefix .. "-ec2.png", aws_textures_directory)
                            entity:set_properties({
-                               visual = "cube",
-                               textures = {"9mine-aws-cloud-fs.png", "9mine-aws-cloud-fs.png", "9mine-aws-cloud-fs.png",
-                                           "9mine-aws-cloud-fs.png", "9mine-aws-cloud-fs.png", "9mine-aws-cloud-fs.png"}
+                               visual = "sprite",
+                               textures = {texture_prefix .. "-ec2.png"}
+                           })
+                       end
+
+                       if entry.platform_string == prefix .. "/ec2/describe-instances" then
+                           texture.download("https://www.pinclipart.com/picdir/middle/323-3231192_aws-simple-icons-compute-amazon-ec2-clipart.png", true,
+                           texture_prefix .. "-ec2-instance.png", aws_textures_directory)
+                           entity:set_properties({
+                               visual = "sprite",
+                               textures = {texture_prefix .. "-ec2-instance.png"}
                            })
                        end
                    end
-                   register.add_texture_handler(init_path .. "9mine-aws-cloud-fs-set-texture", set_texture)       
+                   register.add_texture_handler(init_path .. "9mine-aws-cloud-fs", set_texture)       
                 EOF
                 
           # /<id>/ec2
@@ -75,14 +85,27 @@ fs: |
               sh: *dir
               # /<id>/ec2/describe-instances
             "/describe-instances":
+              cache: 360
               readdir:
-                sh: aws ec2 describe-instances --profile $id  | jq '.Reservations[].Instances[].InstanceId'
+                sh: aws ec2 describe-instances --profile $id  | jq -r '.Reservations[].Instances[].InstanceId'
               getattr:
                 sh: *dir 
               # /<id>/ec2/describe-instances/<instance>
               "/[a-z0-9_-]+":
+                name: instanceid
+                cache: 16000
                 getattr: 
                   sh: *dir 
+                readdir: 
+                  sh: aws ec2 describe-instances --profile $id  | jq -r ".Reservations[].Instances[] | select (.InstanceId==\"$instanceid\")" | jq -r "keys[]"
+                # /<id>/ec2/describe-instances/<instance>/<parameter>
+                "/[a-zA-Z0-9_-]+":
+                  name: parameter
+                  getattr:
+                    sh: *file
+                  read_file:
+                    sh: aws ec2 describe-instances --profile $id  | jq -r ".Reservations[].Instances[] | select (.InstanceId==\"$instanceid\") .\"$parameter\""
+
 
 
 profile: |

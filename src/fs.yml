@@ -35,11 +35,23 @@ fs:
           sh: *dir
           # /<id>/ec2/describe-instances
         "/describe-instances":
+          cache: 360
           readdir:
-            sh: aws ec2 describe-instances --profile $id  | jq '.Reservations[].Instances[].InstanceId'
+            sh: aws ec2 describe-instances --profile $id  | jq -r '.Reservations[].Instances[].InstanceId'
           getattr:
             sh: *dir 
           # /<id>/ec2/describe-instances/<instance>
           "/[a-z0-9_-]+":
+            name: instanceid
+            cache: 16000
             getattr: 
               sh: *dir 
+            readdir: 
+              sh: aws ec2 describe-instances --profile $id  | jq -r ".Reservations[].Instances[] | select (.InstanceId==\"$instanceid\")" | jq -r "keys[]"
+            # /<id>/ec2/describe-instances/<instance>/<parameter>
+            "/[a-zA-Z0-9_-]+":
+              name: parameter
+              getattr:
+                sh: *file
+              read_file:
+                sh: aws ec2 describe-instances --profile $id  | jq -r ".Reservations[].Instances[] | select (.InstanceId==\"$instanceid\") .\"$parameter\""

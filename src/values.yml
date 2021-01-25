@@ -59,6 +59,6 @@ profile: |
         fs_port=${expr $fs_port 1 +}
     }
         
-    grid/reglisten -A -r description ${quote $NINEP_DESCRIPTION} 'tcp!*!'^$port { export $GCLOUD_DIR & }
+    grid/reglisten -A -r description ${quote $NINEP_DESCRIPTION} 'tcp!*!'^$port { export $AWS_DIR & }
     test -n $status && os pkill -9 emu-g
     echo --- end of profile loading ---

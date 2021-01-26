@@ -1,4 +1,4 @@
--- handler for credentials 
+-- handler for credentials
 credentials_event = function(player, formname, fields)
     if formname == "core:aws_credentials" then
         if fields.quit then
@@ -30,7 +30,7 @@ minetest.show_formspec(player_name, "core:aws_credentials",
     table.concat({"formspec_version[4]",
                   "size[8,6,false]",
                   "field[0,0;0,0;service_addr;;", minetest.formspec_escape(res), "]",
-                  "hypertext[0, 0.3; 8, 1;; <bigger><center>Google Cloud<center><bigger>]",
+                  "hypertext[0, 0.3; 8, 1;; <bigger><center>AWS<center><bigger>]",
                   "field[0.5, 1.5; 7, 0.7;access_key;Access Key;]",
                   "field[0.5, 2.6; 7, 0.7;secret_key;Secret Key;]",
                   "field[0.5, 3.7; 7, 0.7;region;Region;]",

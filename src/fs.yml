@@ -47,6 +47,7 @@ fs:
               write_file:
                 sh: |
                     str=`cat $CACHE_FILE_NAME`
+                    rm -f /accounts/$id/out
                     eval "aws $str --profile $id" > /accounts/$id/out 2>&1
       # /<id>/ec2
       "/ec2":

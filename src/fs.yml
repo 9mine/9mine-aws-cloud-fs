@@ -26,6 +26,25 @@ fs:
                   {%- endfilter %}       
             EOF
             
+      # /<id>/n/cmdchan/chan/cmd
+      "/n":
+        getattr:
+          sh: *dir
+        "/cmdchan":
+          getattr: 
+            sh: *dir
+          "/chan":
+            getattr: 
+              sh: *dir
+            "/cmd":
+              getattr: 
+                sh: *file
+              read_file:
+                sh: cat /accounts/$id/out
+              write_file:
+                sh: |
+                    str=`cat $CACHE_FILE_NAME`
+                    eval "aws $str --profile $id" > /accounts/$id/out 2>&1
       # /<id>/ec2
       "/ec2":
         readdir:

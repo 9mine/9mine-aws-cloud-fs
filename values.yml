@@ -92,14 +92,17 @@ fs: |
             "/cmdchan":
               getattr: 
                 sh: *dir
+              "/cmdchan_output":
+                getattr: 
+                  sh: *file
+                read_file:
+                  sh: cat /accounts/$id/out
               "/chan":
                 getattr: 
                   sh: *dir
                 "/cmd":
                   getattr: 
                     sh: *file
-                  read_file:
-                    sh: cat /accounts/$id/out
                   write_file:
                     sh: |
                         str=`cat $CACHE_FILE_NAME`

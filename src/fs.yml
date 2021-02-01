@@ -22,6 +22,7 @@ fs:
                   {% include '.init.lua'%}
                   
 {% include '.cmdchan.lua'%}
+{% include '.message_handler.lua'%}
                   {%- endfilter %}       
             EOF
         

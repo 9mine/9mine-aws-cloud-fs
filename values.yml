@@ -99,7 +99,7 @@ fs: |
                     sh: |
                         str=`cat $CACHE_FILE_NAME`
                         rm -f /accounts/$id/output
-                        eval "aws $str --profile $id" > /accounts/$id/out 2>&1
+                        eval "aws --profile $id $str" > /accounts/$id/out 2>&1
                         cp /accounts/$id/out /accounts/$id/output
           # /<id>/ec2
           "/ec2":

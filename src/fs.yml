@@ -2,22 +2,19 @@
 fs:
   # root
   "/":
+    <<: *is_dir
     readdir: 
       sh: ls /accounts
-    getattr:
-      sh: *dir 
       # /<id>
     "/[0-9]+":
+      <<: *is_dir   
       name: id
       readdir: 
         list: 
         - ec2
-      getattr: 
-          sh: *dir
-      # /<id>/.init.lua
+       # /<id>/.init.lua
       "/.init.lua":
-        getattr:
-          sh: *file
+        <<: *is_file
         read_file: 
           sh: |
             cat <<EOF
@@ -26,55 +23,49 @@ fs:
                   {%- endfilter %}       
             EOF
             
-      # /<id>/n/cmdchan/chan/cmd
       "/n":
-        getattr:
-          sh: *dir
+        <<: *is_dir
         "/cmdchan":
-          getattr: 
-            sh: *dir
+          <<: *is_dir
           "/cmdchan_output":
             getattr: 
-              sh: *file
+              sh: (ls /accounts/$id/output >> /dev/null 2>&1 && echo 'ino=1 mode=-rwxr-xr-x nlink=1 uid=0 gid=0 rdev=0 size=0 blksize=512 blocks=2 atime=0 mtime=0 ctime=0 ')
             read_file:
-              sh: cat /accounts/$id/out
+              sh: cat /accounts/$id/output
           "/chan":
-            getattr: 
-              sh: *dir
+            <<: *is_dir
             "/cmd":
-              getattr: 
-                sh: *file
+              <<: *is_file
               write_file:
                 sh: |
                     str=`cat $CACHE_FILE_NAME`
-                    rm -f /accounts/$id/out
+                    rm -f /accounts/$id/output
                     eval "aws $str --profile $id" > /accounts/$id/out 2>&1
+                    cp /accounts/$id/out /accounts/$id/output
       # /<id>/ec2
       "/ec2":
+        <<: *is_dir
         readdir:
           list: 
           - describe-instances
-        getattr:
-          sh: *dir
+        
           # /<id>/ec2/describe-instances
         "/describe-instances":
+          <<: *is_dir
           cache: 360
           readdir:
             sh: aws ec2 describe-instances --profile $id  | jq -r '.Reservations[].Instances[].InstanceId'
-          getattr:
-            sh: *dir 
+
           # /<id>/ec2/describe-instances/<instance>
           "/[a-z0-9_-]+":
+            <<: *is_dir
             name: instanceid
             cache: 16000
-            getattr: 
-              sh: *dir 
             readdir: 
               sh: aws ec2 describe-instances --profile $id  | jq -r ".Reservations[].Instances[] | select (.InstanceId==\"$instanceid\")" | jq -r "keys[]"
             # /<id>/ec2/describe-instances/<instance>/<parameter>
             "/[a-zA-Z0-9_-]+":
+              <<: *is_file
               name: parameter
-              getattr:
-                sh: *file
               read_file:
                 sh: aws ec2 describe-instances --profile $id  | jq -r ".Reservations[].Instances[] | select (.InstanceId==\"$instanceid\") .\"$parameter\""

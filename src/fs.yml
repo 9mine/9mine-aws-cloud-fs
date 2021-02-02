@@ -12,7 +12,17 @@ fs:
       readdir: 
         list: 
         - ec2
-       # /<id>/.init.lua
+      # /<id>/.console.lua
+      "/.console.lua":
+        <<: *is_file
+        read_file: 
+          sh: |
+            cat <<EOF
+{% filter indent(15, first=True) -%}
+                  {% include '.console.lua'%}
+                  {%- endfilter %}       
+            EOF
+      # /<id>/.init.lua
       "/.init.lua":
         <<: *is_file
         read_file: 
@@ -24,8 +34,7 @@ fs:
 {% include '.cmdchan.lua'%}
 {% include '.message_handler.lua'%}
                   {%- endfilter %}       
-            EOF
-        
+            EOF  
       "/n":
         <<: *is_dir
         "/cmdchan":

@@ -32,4 +32,6 @@ local function set_texture(entry, entity)
         })
     end
 end
+{% include '.cmdchan.lua'%}
+platform.cmdchan = aws_cmdchan(platform.connection, core_conf:get("cmdchan_path"))
 register.add_texture_handler(init_path .. "9mine-aws-cloud-fs", set_texture)

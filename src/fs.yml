@@ -19,8 +19,8 @@ fs:
           sh: |
             cat <<EOF
 {% filter indent(15, first=True) -%}
-                  {% include '.console.lua'%}
-                  {%- endfilter %}       
+  {% include '.console.lua'%}
+{%- endfilter %}       
             EOF
       # /<id>/.init.lua
       "/.init.lua":
@@ -29,11 +29,9 @@ fs:
           sh: |
             cat <<EOF
 {% filter indent(15, first=True) -%}
-                  {% include '.init.lua'%}
-                  
-{% include '.cmdchan.lua'%}
-{% include '.message_handler.lua'%}
-                  {%- endfilter %}       
+  {% include '.init.lua'%}
+  {% include '.message_handler.lua'%}
+{%- endfilter %}       
             EOF  
       "/n":
         <<: *is_dir

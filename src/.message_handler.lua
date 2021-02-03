@@ -13,16 +13,18 @@ local function aws_message_handler(player_name, message)
         message = message:gsub("^aws ", "")
 
         cmdchan:write(message)
-        minetest.after(1, function()
-            local result, response = pcall(cmdchan.read, cmdchan, "/n/cmdchan/cmdchan_output")
-            cmdchan.show_response(response, player_name)
-            if not result then
-                minetest.after(2, function()
-                    result, response = pcall(cmdchan.read, cmdchan, "/n/cmdchan/cmdchan_output")
-                    cmdchan.show_response(response, player_name)
-                end)
-                return
+        minetest.chat_send_player(player_name, "Please, wait for response . . . ")
+        minetest.after(2, function()
+            local function read_response()
+                local result, response = pcall(cmdchan.read, cmdchan, "/n/cmdchan/cmdchan_output")
+                if not result then
+                    minetest.after(2, read_response)
+                    return
+                end
+                minetest.chat_send_player(player_name, message .. "\n" .. response .. "\n")
+                cmdchan.show_response(response, player_name)
             end
+            read_response()
         end)
         return true
     end

@@ -43,7 +43,6 @@ end
 
 local function aws_console(player, formname, fields)
     if formname == "aws:console" then
-        print("Handler called")
         if not (fields.key_enter or fields.send) then
             return
         end

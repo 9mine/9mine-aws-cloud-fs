@@ -99,14 +99,14 @@ fs: |
                            local lua_entity = select(2, next(minetest.get_objects_inside_radius(pos, 0.5))):get_luaentity()
                            local cmdchan = connections:get_connection(player_name, lua_entity.addr):get_cmdchan()
                            cmdchan:write(fields.input:gsub("^aws ", ""))
-                           minetest.show_formspec(player_name, "core:console",
+                           minetest.show_formspec(player_name, "aws:console",
                            table.concat({"formspec_version[4]", "size[13,13,false]", "textarea[0.5,0.5;12.0,10;;;",
                                          minetest.formspec_escape("Please, wait for response"), "]", "field[0.5,10.5;12,1;input;;]",
                                          "field_close_on_enter[input;false]"}, ""))
                            minetest.after(3, function()
                                local response = cmdchan:read("/n/cmdchan/cmdchan_output")
                                lua_entity.output = fields.input .. ": \n" .. response .. "\n" .. lua_entity.output
-                               minetest.show_formspec(player_name, "core:console",
+                               minetest.show_formspec(player_name, "aws:console",
                                    table.concat({"formspec_version[4]", "size[13,13,false]", "textarea[0.5,0.5;12.0,10;;;",
                                                  minetest.formspec_escape(lua_entity.output), "]", "field[0.5,10.5;12,1;input;;]",
                                                  "field_close_on_enter[input;false]", "button[10,11.6;2.5,0.9;send;send]",

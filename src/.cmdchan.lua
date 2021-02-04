@@ -1,7 +1,8 @@
 class "aws_cmdchan"("cmdchan")
 
 function aws_cmdchan:aws_cmdchan(connection, cmdchan_path)
-    cmdchan:cmdchan(connection, cmdchan_path)
+    self.connection = connection
+    self.cmdchan_path = cmdchan_path
 end
 
 function aws_cmdchan:write(command)

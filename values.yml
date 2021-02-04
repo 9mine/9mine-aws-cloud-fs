@@ -223,7 +223,7 @@ fs: |
 
                    register.add_message_handler(init_path .. "aws_message_handler", aws_message_handler)
            
-                EOF  
+                EOF
           "/n":
             <<: *is_dir
             "/cmdchan":

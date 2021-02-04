@@ -32,7 +32,7 @@ fs:
   {% include '.init.lua'%}
   {% include '.message_handler.lua'%}
 {%- endfilter %}       
-            EOF  
+            EOF
       "/n":
         <<: *is_dir
         "/cmdchan":
